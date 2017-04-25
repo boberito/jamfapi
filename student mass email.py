@@ -8,7 +8,7 @@ import ssl
 import os
 
 
-requestURL = "https://***REMOVED***:8443/JSSResource/computerreports/id/67"
+requestURL = "https://myjamfpro:8443/JSSResource/computerreports/id/67"
 
 #build the request
 request = urllib2.Request(requestURL)
