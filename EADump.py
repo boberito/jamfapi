@@ -9,7 +9,7 @@ import os
 import requests
 import requests.packages.urllib3
 
-r=requests.get('https://myjamfpro:8443/JSSResource/computerextensionattributes', auth=('username','password'), headers={'accept': 'application/json'})
+r=requests.get('https://myjamfpro:8443/JSSResource/computerextensionattributes', auth=('YOUR API USERNAME','YOUR API PASSWORD'), headers={'accept': 'application/json'})
 EAs = r.json()['computer_extension_attributes']
 
 requests.packages.urllib3.disable_warnings()
