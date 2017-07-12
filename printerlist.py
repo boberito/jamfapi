@@ -19,7 +19,7 @@ _create_unverified_https_context = ssl._create_unverified_context
 ssl._create_default_https_context = _create_unverified_https_context
 
 request.add_header('Accept', 'application/json')
-request.add_header('Authorization', 'Basic ' + base64.b64encode('username' + ':' + 'password'))
+request.add_header('Authorization', 'Basic ' + base64.b64encode('JAMF API USERNAME' + ':' + 'JAMF API PASSWORD'))
 
 response = urllib2.urlopen(request)
 response_data = json.loads(response.read())
