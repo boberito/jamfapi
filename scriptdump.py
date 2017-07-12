@@ -9,7 +9,7 @@ import os
 import requests
 import requests.packages.urllib3
 
-r=requests.get('https://myjamfpro:8443/JSSResource/scripts', auth=('USER','PASS'), headers={'accept': 'application/json'})
+r=requests.get('https://myjamfpro:8443/JSSResource/scripts', auth=('API USERNAME','API PASS'), headers={'accept': 'application/json'})
 jamfscripts = r.json()['scripts']
 
 requests.packages.urllib3.disable_warnings()
