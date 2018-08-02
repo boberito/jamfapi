@@ -126,7 +126,7 @@ else:
     while True:
 
         user_input = raw_input("Please enter an option: ")
-        if user_input.strip().lower() == "quit":
+        if user_input.strip().lower() == "quit" or user_input.strip().lower() == "q":
             break
         the_input = user_input.split(" ", 3)
         the_input += [None] * (3 - len(the_input))
@@ -136,7 +136,7 @@ else:
             print "   -h \t\t\t\t\t List help"
             print "   -u [Username]\t\t\t List the computers assigned to the user"
             print "   -c [Computer] [enabled/disabled]\t Computer to enable/disable Forced PIV"
-            print "   quit\t\t\t\t Type \'quit\' to quit interactive mode"
+            print "   quit\t\t\t\t\t Type \'quit\' to quit interactive mode"
         elif options == "-u":
             if item == None:
                 print "No username inputted"
@@ -163,3 +163,4 @@ else:
                     print "*** Missing item or action ***"
         else:
             print "Command not found"
+            
