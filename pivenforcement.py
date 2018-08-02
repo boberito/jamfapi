@@ -32,15 +32,15 @@ def PIVAction(url, action):
         #Extension Attribute ID and Name may need to be changed
         xmldata = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><computer><extension_attributes><extension_attribute><id>497</id><name>.PIV Enforced</name><type>String</type><value>" + action + "</value></extension_attribute></extension_attributes></computer>"
         
-        
-        opener = urllib2.build_opener(urllib2.HTTPSHandler)
+      opener = urllib2.build_opener(urllib2.HTTPSHandler)
         request = urllib2.Request(url, data=xmldata)
-        _create_unverified_https_context = ssl._create_unverified_context
-        ssl._create_default_https_context = _create_unverified_https_context
 
         request.add_header('content-type', 'application/xml')
         request.add_header('Authorization', 'Basic ' + base64.b64encode(jssuser + ':' + jsspass))
         request.get_method = lambda: 'PUT'
+
+        response = opener.open(request)
+        
         print "PIV Enforcement has been " + action + " for computer " + sys.argv[2]
     
     else:
@@ -50,9 +50,7 @@ def computerlist(requestURL):
     jsspass = getpass.getpass("Password: ")
 
     request = urllib2.Request(url)
-    _create_unverified_https_context = ssl._create_unverified_context
-    ssl._create_default_https_context = _create_unverified_https_context
-
+    
     request.add_header('Accept', 'application/json')
     request.add_header('Authorization', 'Basic ' + base64.b64encode(jssuser + ':' + jsspass))
 
