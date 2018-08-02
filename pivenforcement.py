@@ -29,7 +29,9 @@ def PIVAction(url, action):
         action = action + "d"
     
     if action == "Enabled" or action == "Disabled":
-        #Extension Attribute ID and Name may need to be changed
+        #####
+        #Extension Attribute ID and Name WILL need to be changed
+        #####
         xmldata = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><computer><extension_attributes><extension_attribute><id>497</id><name>.PIV Enforced</name><type>String</type><value>" + action + "</value></extension_attribute></extension_attributes></computer>"
         
       opener = urllib2.build_opener(urllib2.HTTPSHandler)
