@@ -13,18 +13,27 @@ import ssl
 import urllib
 import getpass
 
-
-def ***REMOVED***(item):
-    if sys.argv[1] == "-u":
-        return "https://YOURJAMFPROSERVER:8443/JSSResource/users/name/" + item
-    elif sys.argv[1] == "-c":
-        return "https://YOURJAMFPROSERVER:8443/JSSResource/computers/name/" + item
-
-def PIVAction(url, action):
+def login():
     jssuser = raw_input("Enter Your JSS Account:")
     jsspass = getpass.getpass("Password: ")
+    return {'user':jssuser, 'pass':jsspass}
+
+#Function to build the Jamf Pro Classic API URL Request
+def ***REMOVED***(arg, item):
+    if arg == "-u":
+        return "https://YOURJAMFPROSERVER:8443/JSSResource/users/name/" + item
+    elif arg == "-c":
+        return "https://YOURJAMFPROSERVER:8443/JSSResource/users/name/" + item
+
+#If you are enabling or disabling function
+def PIVAction(url, action, credentials="MISSING"):
+    if credentials == "MISSING":
+        credentials = login()
+
+    #makes sure everything is the same case
     action = action.lower()
     action = action.capitalize()
+    #script is nice and fixes your mistake
     if action == "Enable" or action == "Disable":
         action = action + "d"
     
@@ -32,29 +41,29 @@ def PIVAction(url, action):
         #####
         #Extension Attribute ID and Name WILL need to be changed
         #####
-        xmldata = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><computer><extension_attributes><extension_attribute><id>497</id><name>.PIV Enforced</name><type>String</type><value>" + action + "</value></extension_attribute></extension_attributes></computer>"
+        xmldata = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><computer><extension_attributes><extension_attribute><id>CHANGEME(EA ID NUMBER NEEDED)</id><name>CHANGEME(EA NAME NEEDED)</name><type>String</type><value>" + action + "</value></extension_attribute></extension_attributes></computer>"
         
-      opener = urllib2.build_opener(urllib2.HTTPSHandler)
+        opener = urllib2.build_opener(urllib2.HTTPSHandler)
         request = urllib2.Request(url, data=xmldata)
 
         request.add_header('content-type', 'application/xml')
-        request.add_header('Authorization', 'Basic ' + base64.b64encode(jssuser + ':' + jsspass))
+        request.add_header('Authorization', 'Basic ' + base64.b64encode(credentials['user'] + ':' + credentials['pass']))
         request.get_method = lambda: 'PUT'
 
         response = opener.open(request)
-        
-        print "PIV Enforcement has been " + action + " for computer " + sys.argv[2]
-    
     else:
         print action + " is not an appropriate action."
-def computerlist(requestURL):
-    jssuser = raw_input("Enter Your JSS Account: ")
-    jsspass = getpass.getpass("Password: ")
+
+
+#if you enter the user it will display the computers assigned to that user
+def computerlist(requestURL, credentials="MISSING"):
+    if credentials == "MISSING":
+        credentials = login()
 
     request = urllib2.Request(url)
     
     request.add_header('Accept', 'application/json')
-    request.add_header('Authorization', 'Basic ' + base64.b64encode(jssuser + ':' + jsspass))
+    request.add_header('Authorization', 'Basic ' + base64.b64encode(credentials['user'] + ':' + credentials['pass']))
 
     response = urllib2.urlopen(request)
     response_data = json.loads(response.read())
@@ -76,19 +85,61 @@ if len(sys.argv) > 1:
 
     elif options == "-u":
         if len(sys.argv) > 2:
-            url = ***REMOVED***(sys.argv[2])
+            url = ***REMOVED***(options, sys.argv[2])
             computerlist(url)
         else:
             print "No username inputted"
     elif options == "-c":
         if len(sys.argv)  > 3:
-            PIVAction(***REMOVED***(sys.argv[2]), sys.argv[3])
+            PIVAction(***REMOVED***(options, sys.argv[2]), sys.argv[3])
+            print "PIV Enforcement has been " + sys.argv[3] + " for computer " + sys.argv[2]
         else:
             print "Missing either computer or action"
     else:
         print "Command not found"
 else:
-    print "   -h \t\t\t\t\t List help"
-    print "   -u [Username]\t\t\t List the computers assigned to the user"
-    print "   -c [Computer] [enabled/disabled]\t Computer to enable/disable Forced PIV"
-    
+
+    #INTERACTIVE MODE BEGINS
+    while True:
+        print "Interactive Mode!"
+        print "------------------------------------"
+        print "   -h \t\t\t\t\t List help"
+        print "   -u [Username]\t\t\t List the computers assigned to the user"
+        print "   -c [Computer] [enabled/disabled]\t Computer to enable/disable Forced PIV"
+        print "   quit\t\t\t\t Type \'quit\' to quit interactive mode"
+        user_input = raw_input("Please enter an option: ")
+        if user_input.strip() == "quit":
+            break
+        the_input = user_input.split(" ", 3)
+        the_input += [None] * (3 - len(the_input))
+        options, item, action = the_input
+        action = str(action)
+        try:
+            apilogin
+        except NameError:
+            apilogin = None
+        if options == "-h":
+            print "   -h \t\t\t\t\t List help"
+            print "   -u [Username]\t\t\t List the computers assigned to the user"
+            print "   -c [Computer] [enabled/disabled]\t Computer to enable/disable Forced PIV"
+            print "   quit\t\t\t\t Type \'quit\' to quit interactive mode"
+        elif options == "-u":
+            if len(the_input) > 2:
+                if apilogin is None:
+                    apilogin = login()
+
+                url = ***REMOVED***(options, item)
+                computerlist(url, apilogin)
+            else:
+                print "No username inputted"
+        elif options == "-c":
+            if len(the_input)  >= 3:
+                if apilogin is None:
+                    apilogin = login()
+
+                PIVAction(***REMOVED***(options, item), action, apilogin)
+                print "PIV Enforcement has been " + action + " for computer " + item
+            else:
+                print "Missing either computer or action"
+        else:
+            print "Command not found"
