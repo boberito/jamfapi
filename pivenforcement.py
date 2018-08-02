@@ -116,47 +116,50 @@ else:
     print "Interactive Mode!"
     print "------------------------------------"
     #INTERACTIVE MODE BEGINS
+    apilogin = "MISSING"
+    print ""        
+    print "   -h \t\t\t\t\t List help"
+    print "   -u [Username]\t\t\t List the computers assigned to the user"
+    print "   -c [Computer] [enabled/disabled]\t Computer to enable/disable Forced PIV"
+    print "   quit\t\t\t\t\t Type \'quit\' to quit interactive mode"
+
     while True:
-        print ""        
-        print "   -h \t\t\t\t\t List help"
-        print "   -u [Username]\t\t\t List the computers assigned to the user"
-        print "   -c [Computer] [enabled/disabled]\t Computer to enable/disable Forced PIV"
-        print "   quit\t\t\t\t Type \'quit\' to quit interactive mode"
+
         user_input = raw_input("Please enter an option: ")
-        if user_input.strip() == "quit":
+        if user_input.strip().lower() == "quit":
             break
         the_input = user_input.split(" ", 3)
         the_input += [None] * (3 - len(the_input))
         options, item, action = the_input
         action = str(action)
-        try:
-            apilogin
-        except NameError:
-            apilogin = None
         if options == "-h":
             print "   -h \t\t\t\t\t List help"
             print "   -u [Username]\t\t\t List the computers assigned to the user"
             print "   -c [Computer] [enabled/disabled]\t Computer to enable/disable Forced PIV"
             print "   quit\t\t\t\t Type \'quit\' to quit interactive mode"
         elif options == "-u":
-            if len(the_input) > 2:
-                if apilogin is None:
+            if item == None:
+                print "No username inputted"
+            else:
+                if apilogin == "MISSING":
                     apilogin = login()
 
                 url = ***REMOVED***(options, item)
-                computerlist(url, apilogin)
-            else:
-                print "No username inputted"
+                Notsuccessful = str(computerlist(url, apilogin))
+                if Notsuccessful == "401":
+                        apilogin = "MISSING"
+            
         elif options == "-c":
-            if len(the_input)  >= 3:
-                if apilogin is None:
+            if action == None:
+                if apilogin == "MISSING":
                     apilogin = login()
 
-                PIVAction(***REMOVED***(options, item), action, apilogin)
-        
+                responseCode = PIVAction(***REMOVED***(options, item), action, apilogin)
+                Notsuccessful = str(computerlist(url, apilogin))
+                if Notsuccessful == "401":
+                    apilogin = "MISSING"
             else:
-                print "Missing either computer or action"
+                    print "------------------------------------"
+                    print "*** Missing item or action ***"
         else:
             print "Command not found"
-
-   
