@@ -139,7 +139,9 @@ else:
             print "   quit\t\t\t\t\t Type \'quit\' to quit interactive mode"
         elif options == "-u":
             if item == None:
-                print "No username inputted"
+                print "----------------------------"
+                print "*** No username inputted ***"
+                print "----------------------------"
             else:
                 if apilogin == "MISSING":
                     apilogin = login()
@@ -150,17 +152,26 @@ else:
                         apilogin = "MISSING"
             
         elif options == "-c":
-            if action == None:
-                if apilogin == "MISSING":
-                    apilogin = login()
-
-                responseCode = PIVAction(***REMOVED***(options, item), action, apilogin)
-                Notsuccessful = str(computerlist(url, apilogin))
-                if Notsuccessful == "401":
-                    apilogin = "MISSING"
+            if item == None:
+                print "--------------------"
+                print "*** Missing item ***"
+                print "--------------------"
             else:
-                    print "------------------------------------"
-                    print "*** Missing item or action ***"
+                print action
+                if action == "None":
+                    print "----------------------"
+                    print "*** Missing action ***"
+                    print "----------------------"
+                else:
+                    if apilogin == "MISSING":
+                        apilogin = login()
+
+                    Notsuccessful = str(PIVAction(***REMOVED***(options, item), action, apilogin))
+                    
+                    if Notsuccessful == "401":
+                        apilogin = "MISSING"
         else:
-            print "Command not found"
-            
+            print "-------------------------"
+            print "*** Command not found ***"
+            print "-------------------------"
+
