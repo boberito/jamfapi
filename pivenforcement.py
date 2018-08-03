@@ -12,6 +12,7 @@ import sys
 import ssl
 import urllib
 import getpass
+import os
 
 def login():
     jssuser = raw_input("Enter Your JSS Account:")
@@ -20,11 +21,19 @@ def login():
 
 #Function to build the Jamf Pro Classic API URL Request
 def ***REMOVED***(arg, item):
-    jamfproserver = "https://YOURJAMFPROSERVER:8443"
+    #if enrolled, use the current jamf server or set the server below
+    #example jamfproserver = "https://YOURJAMFPROSERVER:8443/"
+    #if set to nothing, and it finds the jamf.plist then use the enrolled server
+    jamfproserver = ""
+    pref_path = "/Library/Preferences/com.jamfsoftware.jamf.plist"
+    if os.path.exists(pref_path) is True and jamfproserver == "":
+        command = "defaults read " + pref_path + " jss_url"
+		jamfproserver = str(os.system(command))
+ 
     if arg == "-u":
-        return jamfproserver + "/JSSResource/users/name/" + item
+        return jamfproserver + "JSSResource/users/name/" + item
     elif arg == "-c":
-        return jamfproserver + "/JSSResource/computers/name/" + item
+        return jamfproserver + "JSSResource/computers/name/" + item
 
 #If you are enabling or disabling function
 def PIVAction(url, action, credentials="MISSING"):
@@ -41,8 +50,12 @@ def PIVAction(url, action, credentials="MISSING"):
     if action == "Enabled" or action == "Disabled":
         #####
         #Extension Attribute ID and Name WILL need to be changed
+        #Set EA_ID and EA_name
         #####
-        xmldata = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><computer><extension_attributes><extension_attribute><id>CHANGEME(EA ID NUMBER NEEDED)</id><name>CHANGEME(EA NAME NEEDED)</name><type>String</type><value>" + action + "</value></extension_attribute></extension_attributes></computer>"
+        EA_ID = "934"
+        EA_name = ".PIV Enforced"
+        ##### 
+        xmldata = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><computer><extension_attributes><extension_attribute><id>" + EA_ID + "</id><name>" + EA_name + "</name><type>String</type><value>" + action + "</value></extension_attribute></extension_attributes></computer>"
            
         try:
             opener = urllib2.build_opener(urllib2.HTTPSHandler)
@@ -60,6 +73,7 @@ def PIVAction(url, action, credentials="MISSING"):
                 print "Something went wrong"
 
         except urllib2.URLError, error:
+            #ERROR Checking, returns HTTP Error Codes     
             print "Something went wrong."
             print "Error Code: ", error
         
@@ -72,11 +86,9 @@ def computerlist(requestURL, credentials="MISSING"):
     if credentials == "MISSING":
         credentials = login()
     try:
-        request = urllib2.Request(url)
-    
+        request = urllib2.Request(url)  
         request.add_header('Accept', 'application/json')
         request.add_header('Authorization', 'Basic ' + base64.b64encode(credentials['user'] + ':' + credentials['pass']))
-
         response = urllib2.urlopen(request)
 
         if response.getcode() != "200":
@@ -90,8 +102,11 @@ def computerlist(requestURL, credentials="MISSING"):
             for computer in computers:
                 print "Computer: " + computer['name']
     except urllib2.URLError, error:
+        #ERROR Checking, returns HTTP Error Codes
         print "Something went wrong."
         print "Error Code: ", error
+        
+#Main Function        
 def main():
     if len(sys.argv) > 1:
         options = sys.argv[1]
@@ -117,6 +132,8 @@ def main():
         print "Interactive Mode!"
         print "------------------------------------"
         #INTERACTIVE MODE BEGINS
+        #Loop until not
+        
         apilogin = "MISSING"
         print ""        
         print "   -h \t\t\t\t\t List help"
@@ -125,10 +142,13 @@ def main():
         print "   quit\t\t\t\t\t Type \'quit\' to quit interactive mode"
 
         while True:
-
-            user_input = raw_input("Please enter an option: ")
+            
+            user_input = raw_input("Please enter an option: ")      
+            #ONLY BREAK when user types quit or q
+            #Nice program realizes you meant to quit when typing q
             if user_input.strip().lower() == "quit" or user_input.strip().lower() == "q":
                 break
+                
             the_input = user_input.split(" ", 3)
             the_input += [None] * (3 - len(the_input))
             options, item, action = the_input
