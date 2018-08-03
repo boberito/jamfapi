@@ -26,17 +26,17 @@ def ***REMOVED***(arg, item):
     #if set to nothing, and it finds the jamf.plist then use the enrolled server
     jamfproserver = ""
     pref_path = "/Library/Preferences/com.jamfsoftware.jamf.plist"
+    
     if os.path.exists(pref_path) is True and jamfproserver == "":
         command = "defaults read " + pref_path + " jss_url"
-        jamfproserver = subprocess.check_output(command,stderr=subprocess.STDOUT,shell=True)
+        jamfproserver = subprocess.check_output(command,stderr=subprocess.STDOUT,shell=True)[:-1]
     
     if arg == "-u":
-        jamfproserver = jamfproserver[:-1] + "JSSResource/users/name/" + item
+        jamfproserver = jamfproserver + "JSSResource/users/name/" + item
         return jamfproserver 
     elif arg == "-c":
-        jamfproserver = jamfproserver[:-1] + "JSSResource/computers/name/" + item
+        jamfproserver = jamfproserver + "JSSResource/computers/name/" + item
         return jamfproserver
-
 #If you are enabling or disabling function
 def PIVAction(url, action, credentials="MISSING"):
     if credentials == "MISSING":
