@@ -1,12 +1,9 @@
 #!/usr/bin/python
 
-##################################################################
-#: Date Created  : (August 2nd, 2018)
-#: Author        : Bob Gendler
-#: Email         : robert.gendler@nist.gov
-#: Organization  : OISM
-#: Version       : 1.0
-##################################################################
+#Create an extension attribute
+#Create a smart group based off of that extension attribute
+#Scope policies or configuration profiles to that smart group.
+#Now you have an easy way to toggle that setting on/off for a computer without digging through the JSS
 
 import urllib2
 import base64
