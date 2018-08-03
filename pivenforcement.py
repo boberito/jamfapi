@@ -20,10 +20,11 @@ def login():
 
 #Function to build the Jamf Pro Classic API URL Request
 def ***REMOVED***(arg, item):
+    jamfproserver = "https://YOURJAMFPROSERVER:8443"
     if arg == "-u":
-        return "https://YOURJAMFPROSERVER:8443/JSSResource/users/name/" + item
+        return jamfproserver + "/JSSResource/users/name/" + item
     elif arg == "-c":
-        return "https://YOURJAMFPROSERVER:8443/JSSResource/users/name/" + item
+        return jamfproserver + "/JSSResource/computers/name/" + item
 
 #If you are enabling or disabling function
 def PIVAction(url, action, credentials="MISSING"):
