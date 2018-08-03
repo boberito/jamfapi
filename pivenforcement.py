@@ -92,87 +92,89 @@ def computerlist(requestURL, credentials="MISSING"):
     except urllib2.URLError, error:
         print "Something went wrong."
         print "Error Code: ", error
-
-if len(sys.argv) > 1:
-    options = sys.argv[1]
-    if options == "-h":
-        print "   -h \t\t\t\t\t List help"
-        print "   -u [Username]\t\t\t List the computers assigned to the user"
-        print "   -c [Computer] [enabled/disabled]\t Computer to enable/disable Forced PIV"
-
-    elif options == "-u":
-        if len(sys.argv) > 2:
-            url = ***REMOVED***(options, sys.argv[2])
-            computerlist(url)
-        else:
-            print "No username inputted"
-    elif options == "-c":
-        if len(sys.argv)  > 3:
-            PIVAction(***REMOVED***(options, sys.argv[2]), sys.argv[3])
-        else:
-            print "Missing either computer or action"
-    else:
-        print "Command not found"
-else:
-    print "Interactive Mode!"
-    print "------------------------------------"
-    #INTERACTIVE MODE BEGINS
-    apilogin = "MISSING"
-    print ""        
-    print "   -h \t\t\t\t\t List help"
-    print "   -u [Username]\t\t\t List the computers assigned to the user"
-    print "   -c [Computer] [enabled/disabled]\t Computer to enable/disable Forced PIV"
-    print "   quit\t\t\t\t\t Type \'quit\' to quit interactive mode"
-
-    while True:
-
-        user_input = raw_input("Please enter an option: ")
-        if user_input.strip().lower() == "quit" or user_input.strip().lower() == "q":
-            break
-        the_input = user_input.split(" ", 3)
-        the_input += [None] * (3 - len(the_input))
-        options, item, action = the_input
-        action = str(action)
+def main():
+    if len(sys.argv) > 1:
+        options = sys.argv[1]
         if options == "-h":
             print "   -h \t\t\t\t\t List help"
             print "   -u [Username]\t\t\t List the computers assigned to the user"
             print "   -c [Computer] [enabled/disabled]\t Computer to enable/disable Forced PIV"
-            print "   quit\t\t\t\t\t Type \'quit\' to quit interactive mode"
-        elif options == "-u":
-            if item == None:
-                print "----------------------------"
-                print "*** No username inputted ***"
-                print "----------------------------"
-            else:
-                if apilogin == "MISSING":
-                    apilogin = login()
 
-                url = ***REMOVED***(options, item)
-                Notsuccessful = str(computerlist(url, apilogin))
-                if Notsuccessful == "401":
-                        apilogin = "MISSING"
-            
-        elif options == "-c":
-            if item == None:
-                print "--------------------"
-                print "*** Missing item ***"
-                print "--------------------"
+        elif options == "-u":
+            if len(sys.argv) > 2:
+                url = ***REMOVED***(options, sys.argv[2])
+                computerlist(url)
             else:
-                print action
-                if action == "None":
-                    print "----------------------"
-                    print "*** Missing action ***"
-                    print "----------------------"
+                print "No username inputted"
+        elif options == "-c":
+            if len(sys.argv)  > 3:
+                PIVAction(***REMOVED***(options, sys.argv[2]), sys.argv[3])
+            else:
+                print "Missing either computer or action"
+        else:
+            print "Command not found"
+    else:
+        print "Interactive Mode!"
+        print "------------------------------------"
+        #INTERACTIVE MODE BEGINS
+        apilogin = "MISSING"
+        print ""        
+        print "   -h \t\t\t\t\t List help"
+        print "   -u [Username]\t\t\t List the computers assigned to the user"
+        print "   -c [Computer] [enabled/disabled]\t Computer to enable/disable Forced PIV"
+        print "   quit\t\t\t\t\t Type \'quit\' to quit interactive mode"
+
+        while True:
+
+            user_input = raw_input("Please enter an option: ")
+            if user_input.strip().lower() == "quit" or user_input.strip().lower() == "q":
+                break
+            the_input = user_input.split(" ", 3)
+            the_input += [None] * (3 - len(the_input))
+            options, item, action = the_input
+            action = str(action)
+            if options == "-h":
+                print "   -h \t\t\t\t\t List help"
+                print "   -u [Username]\t\t\t List the computers assigned to the user"
+                print "   -c [Computer] [enabled/disabled]\t Computer to enable/disable Forced PIV"
+                print "   quit\t\t\t\t\t Type \'quit\' to quit interactive mode"
+            elif options == "-u":
+                if item == None:
+                    print "----------------------------"
+                    print "*** No username inputted ***"
+                    print "----------------------------"
                 else:
                     if apilogin == "MISSING":
                         apilogin = login()
 
-                    Notsuccessful = str(PIVAction(***REMOVED***(options, item), action, apilogin))
-                    
+                    url = ***REMOVED***(options, item)
+                    Notsuccessful = str(computerlist(url, apilogin))
                     if Notsuccessful == "401":
-                        apilogin = "MISSING"
-        else:
-            print "-------------------------"
-            print "*** Command not found ***"
-            print "-------------------------"
+                            apilogin = "MISSING"
+                
+            elif options == "-c":
+                if item == None:
+                    print "--------------------"
+                    print "*** Missing item ***"
+                    print "--------------------"
+                else:
+                    print action
+                    if action == "None":
+                        print "----------------------"
+                        print "*** Missing action ***"
+                        print "----------------------"
+                    else:
+                        if apilogin == "MISSING":
+                            apilogin = login()
 
+                        Notsuccessful = str(PIVAction(***REMOVED***(options, item), action, apilogin))
+                    
+                        if Notsuccessful == "401":
+                            apilogin = "MISSING"
+            else:
+                print "-------------------------"
+                print "*** Command not found ***"
+                print "-------------------------"
+    
+if __name__== "__main__":
+  main()
