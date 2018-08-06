@@ -1,10 +1,5 @@
 #!/usr/bin/python
 
-#Create an extension attribute
-#Create a smart group based off of that extension attribute
-#Scope policies or configuration profiles to that smart group.
-#Now you have an easy way to toggle that setting on/off for a computer without digging through the JSS
-
 import urllib2
 import base64
 import json
@@ -14,9 +9,41 @@ import getpass
 import os
 import subprocess
 
+#Delete keychain entry
+def delete_keychain():
+    FNULL = open(os.devnull, 'w')
+    delete_keychain_command ="security delete-generic-password -s piv-enforce"
+    delete_keychain = subprocess.call(delete_keychain_command,stdout=FNULL, stderr=subprocess.STDOUT, shell=True)
+    if delete_keychain == 0:
+        print "Keychain entry deleted successfully"
+    else:
+        print "Keychain entry not found"
+
+#Login function        
 def login():
-    jssuser = raw_input("Enter Your JSS Account:")
-    jsspass = getpass.getpass("Password: ")
+    #check if the keychain entry is there and use it if it is
+    keychaincheck_command = "security find-generic-password -s piv-enforce -w"
+    FNULL = open(os.devnull, 'w')
+    keychain_entry = subprocess.call(keychaincheck_command,stdout=FNULL, stderr=subprocess.STDOUT, shell=True)
+    if keychain_entry == 0:
+        usercommand = "security find-generic-password -s piv-enforce | grep \"acct\" | awk -F \"=\" '{print $2}' | tr -d '\"'"
+        jssuser = subprocess.check_output(usercommand,stderr=subprocess.STDOUT,shell=True)[:-1]
+        passcommand = "security find-generic-password -s piv-enforce -w"
+        jsspass = subprocess.check_output(passcommand,stderr=subprocess.STDOUT,shell=True)[:-1]
+
+    #otherwise use the prompt
+    else:
+        jssuser = raw_input("Enter Your JSS Account:")
+        jsspass = getpass.getpass("Password: ")
+        while True:
+            save_to_keychain = raw_input("Save to Keychain? (Y/N)")
+            if save_to_keychain.lower() == "y":
+                keychain_entry = "security add-generic-password -U -a " + jssuser + " -s piv-enforce -p '" + jsspass + "'"
+                keychain_entry_command = subprocess.call(keychain_entry,stdout=FNULL,stderr=subprocess.STDOUT,shell=True)
+                break
+            elif save_to_keychain.lower() == "n":
+                break
+
     return {'user':jssuser, 'pass':jsspass}
 
 #Function to build the Jamf Pro Classic API URL Request
@@ -37,6 +64,7 @@ def ***REMOVED***(arg, item):
     elif arg == "-c":
         jamfproserver = jamfproserver + "JSSResource/computers/name/" + item
         return jamfproserver
+
 #If you are enabling or disabling function
 def PIVAction(url, action, credentials="MISSING"):
     if credentials == "MISSING":
@@ -109,8 +137,7 @@ def computerlist(requestURL, credentials="MISSING"):
             #ERROR Checking, returns HTTP Error Codes
             print "Something went wrong.\n", error
             return error.code
-    
-    
+        
 #Main Function        
 def main():
     if len(sys.argv) > 1:
@@ -119,7 +146,9 @@ def main():
             print "   -h \t\t\t\t\t List help"
             print "   -u [Username]\t\t\t List the computers assigned to the user"
             print "   -c [Computer] [enabled/disabled]\t Computer to enable/disable Forced PIV"
-
+            print "   -d \t\t\t\t\t Delete keychain entry"
+        elif options == "-d":
+            delete_keychain()
         elif options == "-u":
             if len(sys.argv) > 2:
                 url = ***REMOVED***(options, sys.argv[2])
@@ -138,14 +167,19 @@ def main():
         else:
             print "Command not found"
     else:
+        ######
+        #INTERACTIVE MODE BEGINS
+        ######
+        
         print "Interactive Mode!"
         print "------------------------------------"
-        #INTERACTIVE MODE BEGINS
+        
         apilogin = "MISSING"
         print ""        
         print "   -h \t\t\t\t\t List help"
         print "   -u [Username]\t\t\t List the computers assigned to the user"
         print "   -c [Computer] [enabled/disabled]\t Computer to enable/disable Forced PIV"
+        print "   -d \t\t\t\t\t Delete keychain entry"
         print "   quit\t\t\t\t\t Type \'quit\' to quit interactive mode"
 
         while True:
@@ -162,6 +196,7 @@ def main():
                 print "   -h \t\t\t\t\t List help"
                 print "   -u [Username]\t\t\t List the computers assigned to the user"
                 print "   -c [Computer] [enabled/disabled]\t Computer to enable/disable Forced PIV"
+                print "   -d \t\t\t\t\t Delete keychain entry"
                 print "   quit\t\t\t\t\t Type \'quit\' to quit interactive mode"
             elif options == "-u":
                 if item == None:
@@ -177,14 +212,15 @@ def main():
                     Notsuccessful = str(computerlist(url, apilogin))
                     if Notsuccessful == "401":
                         apilogin = "MISSING"
-            
+            elif options == "-d":
+                delete_keychain()
+
             elif options == "-c":
                 if item == None:
                     print "--------------------"
                     print "*** Missing item ***"
                     print "--------------------"
                 else:
-                    print action
                     if action == "None":
                         print "----------------------"
                         print "*** Missing action ***"
@@ -204,3 +240,4 @@ def main():
 
 if __name__== "__main__":
   main()
+    
