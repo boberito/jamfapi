@@ -62,7 +62,10 @@ def ***REMOVED***(arg, item):
     if os.path.exists(pref_path) is True and jamfproserver == "":
         command = "defaults read " + pref_path + " jss_url"
         jamfproserver = subprocess.check_output(command,stderr=subprocess.STDOUT,shell=True)[:-1]
-    
+    elif os.path.exists(pref_path) is False and jamfproserver == "":
+        print "No JamfPro server set. Please set one."
+        quit()
+        
     if arg == "-u":
         jamfproserver = jamfproserver + "JSSResource/users/name/" + item
         return jamfproserver 
