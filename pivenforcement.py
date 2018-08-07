@@ -1,10 +1,11 @@
 #!/usr/bin/python
 
+
 #Create an extension attribute
 #Create a smart group based off of that extension attribute
 #Scope policies or configuration profiles to that smart group.
 #Now you have an easy way to toggle that setting on/off for a computer without digging through the JSS
-    
+
 import urllib2
 import base64
 import json
@@ -56,16 +57,16 @@ def ***REMOVED***(arg, item):
     #if enrolled, use the current jamf server or set the server below
     #example jamfproserver = "https://YOURJAMFPROSERVER:8443/"
     #if set to nothing, and it finds the jamf.plist then use the enrolled server
-    jamfproserver = ""
+    jamfproserver = "" #<---- If you want to hardcode the jamfpro url
     pref_path = "/Library/Preferences/com.jamfsoftware.jamf.plist"
     
     if os.path.exists(pref_path) is True and jamfproserver == "":
         command = "defaults read " + pref_path + " jss_url"
         jamfproserver = subprocess.check_output(command,stderr=subprocess.STDOUT,shell=True)[:-1]
-    elif os.path.exists(pref_path) is False and jamfproserver == "":
+    elif os.path.exists(pref_path) is False and jamfproserver =="":
         print "No JamfPro server set. Please set one."
         quit()
-        
+
     if arg == "-u":
         jamfproserver = jamfproserver + "JSSResource/users/name/" + item
         return jamfproserver 
@@ -86,13 +87,13 @@ def PIVAction(url, action, credentials="MISSING"):
         action = action + "d"
     
     if action == "Enabled" or action == "Disabled":
-        #####
-        #Extension Attribute ID and Name WILL need to be changed
-        #Set EA_ID and EA_name
-        #####
-        EA_ID = "497"
-        EA_name = ".PIV Enforced"
-        ##### 
+        ###########################################################
+        #Extension Attribute ID and Name WILL need to be changed  #
+        #Set EA_ID and EA_name                                    #
+        ###########################################################
+        EA_ID = "497" #<------Here, extension attribute ID!
+        EA_name = ".PIV Enforced" #<----Here, extension attribute name!
+        #################################### 
         xmldata = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><computer><extension_attributes><extension_attribute><id>" + EA_ID + "</id><name>" + EA_name + "</name><type>String</type><value>" + action + "</value></extension_attribute></extension_attributes></computer>"     
         
         try:
@@ -175,9 +176,9 @@ def main():
         else:
             print "Command not found"
     else:
-        ######
-        #INTERACTIVE MODE BEGINS
-        ######
+        #########################
+        #INTERACTIVE MODE BEGINS#
+        #########################
         
         print "Interactive Mode!"
         print "------------------------------------"
@@ -248,4 +249,3 @@ def main():
 
 if __name__== "__main__":
   main()
-    
