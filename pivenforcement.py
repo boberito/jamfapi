@@ -1,6 +1,5 @@
 #!/usr/bin/python
 
-
 #Create an extension attribute
 #Create a smart group based off of that extension attribute
 #Scope policies or configuration profiles to that smart group.
