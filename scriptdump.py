@@ -22,6 +22,7 @@ for record  in jamfscripts:
 	z=requests.get(JamfProServer + 'JSSResource/scripts/id/%s' % record['id'], auth=(APIUsername,APIPassword), headers={'accept': 'application/json'})
 	scriptfile = "JAMFScripts/" + record['name'] + ".sh"
 	contents = z.json()['script']['script_contents'].encode('utf8')
+	contents = contents.replace("\r","")
 	target = open(scriptfile, 'w')
 	target.write(contents)
 	target.close()
