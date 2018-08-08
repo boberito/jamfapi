@@ -1,5 +1,7 @@
 #!/usr/bin/python
 
+#/Users/Shared/ExtensionAttributes/ has to exist or it fails
+
 import urllib2
 import base64
 import json
@@ -22,7 +24,8 @@ for record in EAs:
 	z=requests.get(JamfProServer + 'JSSResource/computerextensionattributes/id/%s' % record['id'], auth=(APIUsername,APIPassword), headers={'accept': 'application/json'})
 	if z.json()['computer_extension_attribute']['input_type']['type'] == "script":
 		scriptfile = "/Users/Shared/ExtensionAttributes/" + record['name'] + ".sh"
-		contents = z.json()['computer_extension_attribute']['input_type']['script'] 
+		contents = z.json()['computer_extension_attribute']['input_type']['script'].encode("ascii", 'ignore')) 
+		contents = contents.replace("\r","")
 		target = open(scriptfile, 'w')
 		target.write(contents)
 		target.close()
