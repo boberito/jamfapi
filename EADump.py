@@ -17,7 +17,7 @@ requests.packages.urllib3.disable_warnings()
 for record in EAs:
 	z=requests.get('https://myjamfpro:8443/JSSResource/computerextensionattributes/id/%s' % record['id'], auth=('username','password'), headers={'accept': 'application/json'})
 	if z.json()['computer_extension_attribute']['input_type']['type'] == "script":
-		scriptfile = "/Users/rgendler/ExtensionAttributes/" + record['name'] + ".sh"
+		scriptfile = "/Users/Shared/ExtensionAttributes/" + record['name'] + ".sh"
 		contents = z.json()['computer_extension_attribute']['input_type']['script'] 
 		target = open(scriptfile, 'w')
 		target.write(contents)
