@@ -17,7 +17,7 @@ requests.packages.urllib3.disable_warnings()
 for record  in jamfscripts:
 	z=requests.get('https://myjamfpro:8443/JSSResource/scripts/id/%s' % record['id'], auth=('USER','PASS'), headers={'accept': 'application/json'})
 	scriptfile = "JAMFScripts/" + record['name'] + ".sh"
-	contents = z.json()['script']['script_contents']
+	contents = z.json()['script']['script_contents'].encode('utf8')
 	target = open(scriptfile, 'w')
 	target.write(contents)
 	target.close()
