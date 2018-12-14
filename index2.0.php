@@ -180,7 +180,7 @@ $TodayDate = date('Y/m/d');
 		echo "<form action=\"\" method=\"Post\" name=\"laptopsform\" id=\"laptopsform\" onSubmit=\"return DoubleCheck('".$device['name']."');\">";
 		echo "<tr style=\"font-size: 12pt;\">";
 		echo "<input type=\"hidden\" name=\"laptop\" value=\"".$device['serial_number']."\">";
-		echo "<td><a href=\"https://***REMOVED***:8443/computers.html?id=".$device['id']."\" target=\"_blank\">".$device['name']."</a></td>";
+		echo "<td><a href=\"https://casper.saes.org:8443/computers.html?id=".$device['id']."\" target=\"_blank\">".$device['name']."</a></td>";
 
 		$UniqueJSSResource = "computers/serialnumber/". $device['serial_number'];
 		$device_lookups=ReadJSS($UniqueJSSResource);

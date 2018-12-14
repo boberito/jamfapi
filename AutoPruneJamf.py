@@ -1,10 +1,10 @@
 #!/usr/bin/python
 
-#####################################################################
-#: Date Created  : 12/14/2018                                       #
-#: Author        : Bob Gendler    					                        #
-#: Version       : 1.0                                              #
-#####################################################################
+#########################################################################
+#: Date Created  : 12/14/2018                                       	#
+#: Author        : Bob Gendler						#
+#: Version       : 1.0                                              	#
+#########################################################################
 #
 # Scrapes the more the Advanced Computer Search -Hasn't checked in for more than 6 months
 # Moves machines that haven't checked in for more than 6 months to Unmanaged

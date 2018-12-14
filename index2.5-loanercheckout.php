@@ -194,7 +194,7 @@ function DoubleCheck(LaptopConfirm){
 		echo "<form action=\"\" method=\"Post\" name=\"laptopsform\" id=\"laptopsform\" onSubmit=\"return DoubleCheck('".$device['Computer_Name']."');\">";
 		echo "<tr style=\"font-size: 12pt;\">";
 		echo "<input type=\"hidden\" name=\"laptop\" value=\"".$device['Serial_Number']."\">";
-		echo "<td><a href=\"https://***REMOVED***:8443/computers.html?id=".$device['JSS_Computer_ID']."\" target=\"_blank\">".$device['Computer_Name']."</a></td>";
+		echo "<td><a href=\"https://casper.saes.org:8443/computers.html?id=".$device['JSS_Computer_ID']."\" target=\"_blank\">".$device['Computer_Name']."</a></td>";
 		if($device['Availability'] == "No"){
 			echo "<td><a href=\"mailto:".$device['Username']."@saes.org\" target=\"_blank\">".$device['Username']."</a></td>";
 			echo "<td>".$device['DateOut']."</td>";

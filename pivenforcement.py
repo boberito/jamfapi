@@ -52,7 +52,7 @@ def login():
     return {'user':jssuser, 'pass':jsspass}
 
 #Function to build the Jamf Pro Classic API URL Request
-def ***REMOVED***(arg, item):
+def jssapi(arg, item):
     #if enrolled, use the current jamf server or set the server below
     #example jamfproserver = "https://YOURJAMFPROSERVER:8443/"
     #if set to nothing, and it finds the jamf.plist then use the enrolled server
@@ -159,7 +159,7 @@ def main():
             delete_keychain()
         elif options == "-u":
             if len(sys.argv) > 2:
-                url = ***REMOVED***(options, sys.argv[2])
+                url = jssapi(options, sys.argv[2])
                 computerlist(url)
             else:
                 print "----------------------------"
@@ -167,7 +167,7 @@ def main():
                 print "----------------------------"
         elif options == "-c":
             if len(sys.argv)  > 3:
-                PIVAction(***REMOVED***(options, sys.argv[2]), sys.argv[3])
+                PIVAction(jssapi(options, sys.argv[2]), sys.argv[3])
             else:
                 print "------------------------------"
                 print "*** Missing item or action ***"
@@ -215,7 +215,7 @@ def main():
                     if apilogin == "MISSING":
                         apilogin = login()
 
-                    url = ***REMOVED***(options, item)
+                    url = jssapi(options, item)
                     print url
                     Notsuccessful = str(computerlist(url, apilogin))
                     if Notsuccessful == "401":
@@ -237,7 +237,7 @@ def main():
                         if apilogin == "MISSING":
                             apilogin = login()
 
-                        Notsuccessful = str(PIVAction(***REMOVED***(options, item), action, apilogin))
+                        Notsuccessful = str(PIVAction(jssapi(options, item), action, apilogin))
                     
                         if Notsuccessful == "401":
                             apilogin = "MISSING"
