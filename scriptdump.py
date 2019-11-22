@@ -5,26 +5,35 @@ import base64
 import json
 import sys
 import ssl
+import getpass
 import os
-import requests
-import requests.packages.urllib3
 
-APIUsername=''
-APIPassword=''
-JamfProServer='https://YOURJAMFPROSERVER:8443/'
+JSSServer='https://Jamf Pro Server:8443'
 
-r=requests.get(JamfProServer + 'JSSResource/scripts', auth=(APIUsername,APIPassword), headers={'accept': 'application/json'})
-jamfscripts = r.json()['scripts']
+JSSUser = raw_input("Enter Your JSS Account:")
+JSSPass = getpass.getpass("Password: ")
 
-requests.packages.urllib3.disable_warnings()
+ScriptrequestURL = JSSServer + "/JSSResource/scripts"
+request = urllib2.Request(ScriptrequestURL)   
+request.add_header('Accept', 'application/json')
+request.add_header('Authorization', 'Basic ' + base64.b64encode(JSSUser + ':' + JSSPass))
+response = urllib2.urlopen(request)
 
-for record  in jamfscripts:
-	z=requests.get(JamfProServer + 'JSSResource/scripts/id/%s' % record['id'], auth=(APIUsername,APIPassword), headers={'accept': 'application/json'})
-	scriptfile = "JAMFScripts/" + record['name'] + ".sh"
-	contents = z.json()['script']['script_contents'].encode('utf8')
-	contents = contents.replace("\r","")
-	target = open(scriptfile, 'w')
-	target.write(contents)
-	target.close()
-	
-
+response_data = json.loads(response.read())
+JamfScripts = response_data['scripts']
+for record in JamfScripts:
+    scriptrequest = JSSServer + '/JSSResource/scripts/id/%s' % record['id']
+    request = urllib2.Request(scriptrequest)   
+    request.add_header('Accept', 'application/json')
+    request.add_header('Authorization', 'Basic ' + base64.b64encode(JSSUser + ':' + JSSPass))
+    response = urllib2.urlopen(request)
+    response_data = json.loads(response.read())
+    contents = str(response_data['script']['script_contents'].encode("ascii", 'ignore'))
+    contents = contents.replace("\r","")
+    scriptfile = "/Users/Shared/JAMFScripts/" + record['name']
+    if scriptfile[-3:] != ".sh":
+        scriptfile = scriptfile + ".sh"
+    scriptfile = scriptfile.replace(" ", "_")
+    target = open(scriptfile, 'w')
+    target.write(contents)
+    target.close()
