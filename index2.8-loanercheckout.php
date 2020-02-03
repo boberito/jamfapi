@@ -18,14 +18,14 @@
 #EA - Availability set as Input Type Pop Up Menu, choices Yes and No
 
 #global settings
-$jss = 'https://jamfproURL:8443';
-$emailDomain = 'whatever.org';
-$username = 'apiusername';
-$password = 'apipassword';
+$jss = 'https://jamfproserver:8443';
+$emailDomain = 'emailDomain.org';
+$username = 'username';
+$password = 'password';
 $availabilityID = 'xx';
 $returnedID = 'xx';
 $outID = 'xx';
-$advancedComputerSearch = 'xxx';
+$advancedComputerSearch = 'xx';
 
 $jssAPI = $jss."/JSSResource/";
 
@@ -34,19 +34,16 @@ function PUTintoCasper($JSSResource, $Avail) {
 
 	$userpass = $GLOBALS['username'].":".$GLOBALS['password'];
 	$remote_url = $GLOBALS['jssAPI'] . $JSSResource;
-	$availID = $GLOBALS['availabilityID'];
-	$in = $GLOBALS['returnedID'];
-	$out = $GLOBALS['outID'];
 	$xml = "";
 	
 	
 	if ($Avail == "Yes"){
 #checking out a laptop	
-		$xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><computer><location><username></username><real_name></real_name><email_address></email_address><department></department></location><extension_attributes><extension_attribute><id>".$availID."</id><value>".$Avail."</value></extension_attribute><extension_attribute><id>".$in."</id><value>".$_POST['DateReturned']."</value></extension_attribute></extension_attributes></computer>";
+		$xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><computer><location><username></username><real_name></real_name><email_address></email_address><department></department></location><extension_attributes><extension_attribute><id>".$GLOBALS['availabilityID']."</id><value>".$Avail."</value></extension_attribute><extension_attribute><id>".$GLOBALS['returnedID']."</id><value>".$_POST['DateReturned']."</value></extension_attribute></extension_attributes></computer>";
 
 	} elseif ($Avail == "No"){
 #checking in a laptop	
-		$xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><computer><location><username>".$_POST['User']."</username></location><extension_attributes><extension_attribute><id>".$availID."</id><type>String</type><value>".$Avail."</value></extension_attribute><extension_attribute><id>".$out."</id><type>Date</type><value>".$_POST['DateOut']."</value></extension_attribute></extension_attributes></computer>";
+		$xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><computer><location><username>".$_POST['User']."</username></location><extension_attributes><extension_attribute><id>".$GLOBALS['availabilityID']."</id><type>String</type><value>".$Avail."</value></extension_attribute><extension_attribute><id>".$GLOBALS['outID']."</id><type>Date</type><value>".$_POST['DateOut']."</value></extension_attribute></extension_attributes></computer>";
 		
 	}
 
@@ -62,12 +59,12 @@ function PUTintoCasper($JSSResource, $Avail) {
 	curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
 	curl_setopt($ch, CURLOPT_USERPWD, $GLOBALS['username'].":".$GLOBALS['password']);
 	curl_setopt($ch, CURLOPT_POSTFIELDS, $xml); 
-	curl_setopt($ch, CURLOPT_STDERR, $out); 
+	curl_setopt($ch, CURLOPT_STDERR, $GLOBALS['outID']); 
     
 	$response = curl_exec($ch);
 	curl_close($ch);	
     
-	fclose($out);  
+	fclose($GLOBALS['outID']);  
 
 
 	
