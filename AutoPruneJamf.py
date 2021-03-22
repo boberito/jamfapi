@@ -20,7 +20,7 @@ import csv
 import plistlib
 from datetime import date, timedelta
 from time import gmtime, strftime
-
+import subprocess
 
 #Base64 of credentials
 # format username:password
@@ -32,10 +32,16 @@ ACS = '421'
 outputcsv = "/Library/Logs/Moved-to-Unmanaged.log"
 target = open(outputcsv, 'a')
 
-#You can set jamfURL to https://jamfserver:8443/ or read from the plist.
-with open("/Library/Preferences/com.jamfsoftware.jamf.plist", 'rb') as fp:
-    pl = plistlib.load(fp)
-jamfURL = pl["jss_url"]
+#You can set jamfURL to https://jamfserver:8443/ or read from the plist
+#whatever is more fun for you, and just comment out line 41-43
+pref_path = "/Library/Preferences/com.jamfsoftware.jamf.plist"
+
+jamfURL = ""
+
+if os.path.exists(pref_path) is True and jamfproserver == "":
+	command = "defaults read " + pref_path + " jss_url"
+	jamfURL = subprocess.check_output(command,stderr=subprocess.STDOUT,shell=True)[:-1]
+
 
 today = date.today()
 todayDate=today.strftime('%m-%d-%y')
