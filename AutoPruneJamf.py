@@ -1,10 +1,6 @@
 #!/usr/bin/python
 
-#########################################################################
-#: Date Created  : 12/14/2018                                       	#
-#: Author        : Bob Gendler						#
-#: Version       : 1.0                                              	#
-#########################################################################
+#####################################################################
 #
 # Scrapes the more the Advanced Computer Search -Hasn't checked in for more than 6 months
 # Moves machines that haven't checked in for more than 6 months to Unmanaged
@@ -21,19 +17,31 @@ import json
 import os
 import ssl
 import csv
+import plistlib
 from datetime import date, timedelta
 from time import gmtime, strftime
+
+
+#Base64 of credentials
+# format username:password
+credentials = ''
+
+#Advanced Computer Search ID of machines that have a last checkin or inventory of more than 6 months
+ACS = '421'
 
 outputcsv = "/Library/Logs/Moved-to-Unmanaged.log"
 target = open(outputcsv, 'a')
 
-#BASE64 Credentials
-credentials = ''
+#You can set jamfURL to https://jamfserver:8443/ or read from the plist.
+with open("/Library/Preferences/com.jamfsoftware.jamf.plist", 'rb') as fp:
+    pl = plistlib.load(fp)
+jamfURL = pl["jss_url"]
 
 today = date.today()
 todayDate=today.strftime('%m-%d-%y')
 
-jamfproserver = 'https://YOURJAMFPROSERVER/JSSResource/advancedcomputersearches/id/XYZ'
+
+jamfproserver = jamfURL + 'JSSResource/advancedcomputersearches/id/' + ACS
 request = urllib2.Request(jamfproserver)   
 request.add_header('Accept', 'application/json')
 request.add_header('Authorization', 'Basic ' + credentials)
@@ -43,10 +51,15 @@ response_data = json.loads(jamfresponse.read())
 computers = response_data['advanced_computer_search']['computers']
 newlist = []
 previous_entry = ""
+
+
+####
+# This is the portion that moves old machines to unmanaged
+###
 for computer in computers:
 	if computer['Managed'] == "Managed":
 			xmldata = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><computer><general><remote_management><managed>false</managed></remote_management></general></computer>"
-			jamfcomputer = "https://YOURJAMFPROSERVER/JSSResource/computers/serialnumber/" + computer['Serial_Number']
+			jamfcomputer = jamfproserver + "JSSResource/computers/serialnumber/" + computer['Serial_Number']
 
 			opener = urllib2.build_opener(urllib2.HTTPSHandler)
 			request = urllib2.Request(jamfcomputer, data=xmldata)
@@ -64,6 +77,11 @@ target.close()
 logfile = file("/Library/Logs/Moved-to-Unmanaged.log")
 unmanaged = csv.reader(logfile)
 
+####
+# This is the portion that deletes old machines
+###
+
+### comment out all below if you dont want deleting
 for row in unmanaged:
 	checkIn = row[4].split(": ")
 	justDate = checkIn[1].split(" ")
@@ -72,22 +90,28 @@ for row in unmanaged:
 	yearAgoDate = yearAgo.strftime('%Y-%m-%d')
 	if justDate[0] < yearAgoDate:
 		
-		computerRecordOutput = "/Library/Logs/unmanaged_computers_deleted/" + row[1] + ".xml"
-		computerXML = open(computerRecordOutput, "w")
-		jamfProServerComputer = 'https://YOURJAMFPROSERVER/JSSResource/computers/serialnumber/' + row[2]
-		request = urllib2.Request(jamfProServerComputer)   
-		request.add_header('Accept', 'text/xml')
-		request.add_header('Authorization', 'Basic ' + credentials)
-		jamfresponse = urllib2.urlopen(request)
-		
-		print >> computerXML, jamfresponse.read()
-		
-		computerXML.close()
-		computerToDelete = "https://YOURJAMFPROSERVER/JSSResource/computers/serialnumber/" + computer['Serial_Number']
-		opener = urllib2.build_opener(urllib2.HTTPSHandler)
-		request = urllib2.Request(computerToDelete)
-		request.add_header('Authorization', 'Basic ' + credentials)
-		request.get_method = lambda: 'DELETE'
-		response = opener.open(request)
+		computerRecordOutput = "/Library/Logs/unmanaged_computers_deleted/" + row[1][1:] + ".xml"
+		#print computerRecordOutput
+		if os.path.exists(computerRecordOutput) is False:
+			computerXML = open(computerRecordOutput, "w")
+			jamfProServerComputer = jamfproserver + 'JSSResource/computers/serialnumber/' + row[2]
+			request = urllib2.Request(jamfProServerComputer)   
+			request.add_header('Accept', 'text/xml')
+			request.add_header('Authorization', 'Basic ' + credentials)
+			jamfresponse = urllib2.urlopen(request)
+			print jamfProServerComputer
+            print >> computerXML, jamfresponse.read()
+			computerXML.close()
+
+			computerToDelete = jamfproserver + "JSSResource/computers/serialnumber/" + row[2]
+			#print computerToDelete
+			#computerToDelete = jamfproserver + "JSSResource/computers/serialnumber/" + computer['Serial_Number']
+			#print computerToDelete
+			opener = urllib2.build_opener(urllib2.HTTPSHandler)
+			request = urllib2.Request(computerToDelete)
+			request.add_header('Authorization', 'Basic ' + credentials)
+			request.get_method = lambda: 'DELETE'
+			response = opener.open(request)
+			#print computerToDelete
 
 logfile.close()
